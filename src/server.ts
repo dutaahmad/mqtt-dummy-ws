@@ -5,15 +5,33 @@ import { CurrentSensorData, WaveSensorData, WeatherStationData } from './type';
 
 const app = express();
 const port = 8000;
+
+/**
+ * @constant {mqttConfig}
+ * @description default mqtt client options to publish topics and will use the ws protocol
+ * @example
+ * // MQTT Setup
+ * const mqttClient = mqtt.connect(mqttConfig);
+ */
 const mqttConfig: IClientOptions = {
     host: getEnv().MQTT_BROKER_URL,
     port: Number(getEnv().MQTT_BROKER_PORT_WS),
     username: getEnv().MQTT_ACCESS_USERNAME,
     password: getEnv().MQTT_ACCESS_PASSWORD,
-    protocol: 'ws',
+    protocol: 'ws'
 }
 
-// const MQTT_URL = 
+/**
+ * @constant {MQTT_URL}
+ * @description The MQTT URL to connect to. using this url will make the mqtt client connect to the broker using the mqtt protocol. or version mqttv311
+ * @example
+ * // MQTT Setup
+    const mqttClient = mqtt.connect(MQTT_URL, {
+        username: mqttConfig.username,
+        password: mqttConfig.password,
+    });
+*/
+const MQTT_URL = `mqtt://${mqttConfig.host}:1883`
 
 // MQTT Setup
 const mqttClient = mqtt.connect(mqttConfig);
