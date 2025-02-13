@@ -4,7 +4,7 @@ import { getEnv } from './env';
 import { CurrentSensorData, WaveSensorData, WeatherStationData } from './type';
 
 const app = express();
-const port = 8000;
+const port = getEnv().APP_PORT;
 
 /**
  * @constant {mqttConfig}
