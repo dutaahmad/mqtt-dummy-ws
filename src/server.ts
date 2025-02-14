@@ -1,7 +1,8 @@
 import express from 'express';
 import mqtt, { type IClientOptions } from 'mqtt';
 import { getEnv } from './env';
-import { CurrentSensorData, WaveSensorData, WeatherStationData } from './type';
+import { CurrentSensorData, WaveSensorData } from './type';
+import { cachedWeatherData, fetchWeatherData } from './datasource/getWeatherData';
 
 const app = express();
 const port = getEnv().APP_PORT;
@@ -36,6 +37,18 @@ const MQTT_URL = `mqtt://${mqttConfig.host}:1883`
 // MQTT Setup
 const mqttClient = mqtt.connect(mqttConfig);
 
+// Function to publish cached weather data every second
+const publishCachedWeatherData = () => {
+    if (!cachedWeatherData) return;
+
+    mqttClient.publish('sensor/weather-station', JSON.stringify(cachedWeatherData));
+    console.log('Published cached weather data to MQTT', {
+        topic: 'sensor/weather-station',
+        cachedWeatherData,
+        mqttConfig
+    });
+};
+
 mqttClient.on('connect', () => {
     console.log('Connected to MQTT broker');
 
@@ -61,17 +74,20 @@ mqttClient.on('connect', () => {
     }, 1000); // every second
 
     // publish dummy weather station data every second
-    setInterval(() => {
-        const dummyWeatherStationData: WeatherStationData = {
-            timestamp: new Date().toISOString(),
-            windSpeed: Math.random() * 10, // Random value between 0 and 10
-            windDirection: Math.random() < 0.5 ? 'N' : 'S', // Random value between 0 and 10
-            temperature: Math.random() * 10, // Random value between 0 and 10
-            humidity: Math.random() * 100, // Random value between 0 and 100
-        };
-        mqttClient.publish('sensor/weather-station', JSON.stringify(dummyWeatherStationData));
-        console.log('Published dummy weather station data:', { topic: 'sensor/weather-station', dummyWeatherStationData, mqttConfig });
-    }, 1000); // every second
+    // setInterval(() => {
+    //     const dummyWeatherStationData: WeatherStationData = {
+    //         timestamp: new Date().toISOString(),
+    //         windSpeed: Math.random() * 10, // Random value between 0 and 10
+    //         windDirection: Math.random() < 0.5 ? 'N' : 'S', // Random value between 0 and 10
+    //         temperature: Math.random() * 10, // Random value between 0 and 10
+    //         humidity: Math.random() * 100, // Random value between 0 and 100
+    //     };
+    //     mqttClient.publish('sensor/weather-station', JSON.stringify(dummyWeatherStationData));
+    //     console.log('Published dummy weather station data:', { topic: 'sensor/weather-station', dummyWeatherStationData, mqttConfig });
+    // }, 1000); // every second
+    fetchWeatherData(); // Initial fetch
+    setInterval(fetchWeatherData, 5 * 60 * 1000); // Fetch every 5 minutes
+    setInterval(publishCachedWeatherData, 1000); // Send cached data every second
 });
 
 mqttClient.on('error', (err) => {
