@@ -1,7 +1,7 @@
 import express from 'express';
 import mqtt, { type IClientOptions } from 'mqtt';
 import { getEnv } from './env';
-import { CurrentSensorData, WaveSensorData } from './type';
+import { CurrentSensorData, WaveSensorData, WeatherStationData } from './type';
 import { cachedWeatherData, fetchWeatherData } from './datasource/getWeatherData';
 
 const app = express();
@@ -40,8 +40,18 @@ const mqttClient = mqtt.connect(mqttConfig);
 // Function to publish cached weather data every second
 const publishCachedWeatherData = () => {
     if (!cachedWeatherData) return;
-
-    mqttClient.publish('sensor/weather-station', JSON.stringify(cachedWeatherData));
+    const windSpeed = 0 // filter value from BMKGWeatherResponse.cachedWeatherData.data[0].cuaca.element > currentTimestamp and cachedWeatherData.data[0].cuaca.element < tomorrow, when filter done get the value of ws
+    const windDirection = 'N' // filter value from BMKGWeatherResponse.cachedWeatherData.data[0].cuaca.element > currentTimestamp and cachedWeatherData.data[0].cuaca.element < tomorrow, when filter done get the value of wd
+    const temperature = 0 // filter value from BMKGWeatherResponse.cachedWeatherData.data[0].cuaca.element > currentTimestamp and cachedWeatherData.data[0].cuaca.element < tomorrow, when filter done get the value of t
+    const humidity = 0 // filter value from BMKGWeatherResponse.cachedWeatherData.data[0].cuaca.element > currentTimestamp and cachedWeatherData.data[0].cuaca.element < tomorrow, when filter done get the value of hu
+    const dummyWeatherStationData: WeatherStationData = {
+        timestamp: new Date().toISOString(),
+        windSpeed,
+        windDirection: windDirection,
+        temperature: temperature, // Random value between 0 and 10
+        humidity: humidity, // Random value between 0 and 100
+    };
+    mqttClient.publish('sensor/weather-station', JSON.stringify(dummyWeatherStationData));
     console.log('Published cached weather data to MQTT', {
         topic: 'sensor/weather-station',
         cachedWeatherData,
