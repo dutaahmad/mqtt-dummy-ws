@@ -17,14 +17,15 @@ export const fetchWeatherData = () => {
   
       res.on('end', () => {
         try {
+          console.log('RAW WEATHER DATA|', data);
           cachedWeatherData = JSON.parse(data);
           lastUpdated = Date.now();
-          console.log('Weather data updated:', cachedWeatherData);
+          console.log('WEATHER DATA|', cachedWeatherData);
         } catch (error) {
-          console.error('Error parsing weather data:', error);
+          console.error('ERROR PARSING WEATHER DATA|', error);
         }
       });
     }).on('error', (err) => {
-      console.error('Error fetching weather data:', err);
+      console.error('ERROR FETCHING WEATHER DATA|', err);
     });
   };

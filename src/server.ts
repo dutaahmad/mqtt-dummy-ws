@@ -52,7 +52,7 @@ const publishCachedWeatherData = () => {
         humidity: humidity, // Random value between 0 and 100
     };
     mqttClient.publish('sensor/weather-station', JSON.stringify(dummyWeatherStationData));
-    console.log('Published cached weather data to MQTT', {
+    console.log('PUBLISHED CACHED DATA|', {
         topic: 'sensor/weather-station',
         cachedWeatherData,
         mqttConfig
@@ -69,7 +69,7 @@ mqttClient.on('connect', () => {
             speed: Math.random() * 5, // Random value between 0 and 5
         };
         mqttClient.publish('sensor/current', JSON.stringify(dummyCurrentSensorData));
-        console.log('Published dummy data:', { topic: 'sensor/current', dummyCurrentSensorData, mqttConfig });
+        console.log('PUBLISHED DUMMY DATA|', { topic: 'sensor/current', dummyCurrentSensorData, mqttConfig });
     }, 1000); // every second
 
     // Publish dummy wave and tide sensor data every second
@@ -80,7 +80,7 @@ mqttClient.on('connect', () => {
             tideLevel: Math.random() * 10, // Random value between 0 and 10,
         };
         mqttClient.publish('sensor/wave-tide', JSON.stringify(dummyWaveSensorData));
-        console.log('Published dummy wave and tide data:', { topic: 'sensor/wave-tide', dummyWaveSensorData, mqttConfig });
+        console.log('PUBLISHED DUMMY DATA|', { topic: 'sensor/wave-tide', dummyWaveSensorData, mqttConfig });
     }, 1000); // every second
 
     // publish dummy weather station data every second
@@ -101,7 +101,7 @@ mqttClient.on('connect', () => {
 });
 
 mqttClient.on('error', (err) => {
-    console.error('MQTT connection error:', err);
+    console.error('MQTT CONNECTION ERROR|', err);
 });
 
 // Basic Express server
@@ -111,5 +111,12 @@ app.get('/', (req, res) => {
 
 // Start the Express server
 app.listen(port, () => {
-    console.log(`Express server running on http://localhost:${port}`);
+    console.log('SERVER RUNNING STATUS|', {
+        host: 'http://localhost',
+        port,
+        app_meta_data: {
+            mqttClientStatus: mqttClient.connected ? 'CONNECTED' : 'DISCONNECTED',
+            appStatus: 'RUNNING'
+        }
+    });
 });
