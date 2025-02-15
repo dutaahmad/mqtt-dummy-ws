@@ -1,7 +1,7 @@
 import http from 'http';
 import { BMKGWeatherResponse } from '../type';
 
-export const WEATHER_API_URL = 'http://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=33.02.19.2013';
+export const WEATHER_API_URL = 'https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=33.02.19.2013';
 
 export let cachedWeatherData: BMKGWeatherResponse | null = null; // Store latest fetched data
 let lastUpdated: number = 0; // Timestamp for last update
@@ -27,5 +27,5 @@ export const fetchWeatherData = () => {
       });
     }).on('error', (err) => {
       console.error('ERROR FETCHING WEATHER DATA|', err);
-    });
+    }).protocol = 'https';
   };
