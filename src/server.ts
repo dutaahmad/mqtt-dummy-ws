@@ -64,9 +64,10 @@ mqttClient.on('connect', () => {
 
     // Publish current dummy data every second
     setInterval(() => {
+        const speed = parseFloat((Math.random() * 5).toFixed(2));
         const dummyCurrentSensorData: CurrentSensorData = {
             timestamp: new Date().toISOString(),
-            speed: Math.random() * 5, // Random value between 0 and 5
+            speed, // Random value between 0 and 5
         };
         mqttClient.publish('sensor/current', JSON.stringify(dummyCurrentSensorData));
         console.log('PUBLISHED DUMMY DATA|', { topic: 'sensor/current', dummyCurrentSensorData, mqttConfig });
@@ -74,10 +75,12 @@ mqttClient.on('connect', () => {
 
     // Publish dummy wave and tide sensor data every second
     setInterval(() => {
+        const waveHeight = parseFloat((Math.random() * 10).toFixed(2));
+        const tideLevel = parseFloat((Math.random() * 10).toFixed(2));
         const dummyWaveSensorData: WaveSensorData = {
             timestamp: new Date().toISOString(),
-            waveHeight: Math.random() * 10, // Random value between 0 and 10,
-            tideLevel: Math.random() * 10, // Random value between 0 and 10,
+            waveHeight, // Random value between 0 and 10,
+            tideLevel, // Random value between 0 and 10,
         };
         mqttClient.publish('sensor/wave-tide', JSON.stringify(dummyWaveSensorData));
         console.log('PUBLISHED DUMMY DATA|', { topic: 'sensor/wave-tide', dummyWaveSensorData, mqttConfig });
